@@ -1,0 +1,16 @@
+{
+	"name" : "Forum feeder",
+	"version" : "1.1",
+	"description" : "A forum monitor. (In slow development)",
+	"background_page" : "bg.html",
+	"icons" : { "48" : "icon_48.png", "128" : "icon_128.png" },
+	"browser_action" : {
+		"default_icon": "icon_19.png",
+		"default_title": "Forum Feeder v1.01",
+		"popup" : "popup.html"
+	},
+	"permissions" : [
+		"tabs", "http://*.discuss.com.hk/*"
+	],
+	"options_page" : "options.html"
+}

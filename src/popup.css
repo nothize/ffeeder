@@ -1,0 +1,30 @@
+#c {
+	min-width: 100px;
+	max-height: 300px;	
+	overflow: hidden;
+	overflow-y: scroll;
+}
+div {
+	font-size: 10pt;
+}
+.table {
+	display: table;
+}
+.row, .hrow {
+	display: table-row;
+}
+.hrow {
+	font-weight: bold;
+}
+.cell, .rcell {
+	display: table-cell;
+	padding: 0 4 0 4;
+	white-space: nowrap;
+}
+.rcell {
+	text-align: right;
+}
+.topic {
+	min-width: 100px;
+	overflow: hidden;
+}

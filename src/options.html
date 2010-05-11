@@ -1,0 +1,91 @@
+<html>
+<head>
+<style>
+body {
+	font-family: arial;
+}
+.container {
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid #ddd;
+	padding: 30 30 30 30;
+}
+.historyContainer {
+	padding: 40 0 0 0;
+}
+.optionHeader {
+	font-size: 18pt;
+	font-weight: bold;
+	padding-bottom: 10;
+}
+.historyHeader {
+	font-weight: bold;
+	padding-bottom: 10;
+}
+.options, .history {
+	width: 100%;
+}
+.history {
+	display: table;
+	width: 100%;
+	font-size: 10pt;;
+}
+.historyDate {
+	white-space: nowrap;
+	vertical-align: top;
+}
+</style>
+<script src="ffeeder.js"></script>
+<script>
+var Option = {
+	init: function() {
+		var fid = getFid();
+		gn0("fid").value = fid;
+	},
+	save: function () {
+		setFid(gn0("fid").value)
+		id("rez").innerText = "Setting is saved."
+	},
+	reset: function() {
+		Option.setFid(Default.fid);
+		id("rez").innerText = "Setting is reset."
+	},
+	setFid: function(fid) {
+		setFid(fid);
+		gn0("fid").value = fid;
+	}
+}
+</script>
+</head>
+<body onload="Option.init()">
+	<div class="container">
+		<div class="optionHeader">Forum Feeder Options</div>
+		<div class="options">
+			<div class="option">
+				Forum ID:
+				<input type="text" name="fid"/>
+			</div>
+			<input type="button" value="Save" onclick="Option.save()"/>
+			<input type="button" value="Reset" onclick="Option.reset()"/>
+			<div id="rez">
+				&nbsp;
+			</div>
+		</div>
+		<div class="historyContainer">
+			<div class="historyHeader">Version history</div>
+				<table class="history">
+					<tr>
+						<td class="historyDate">2010-05-09 v1.01</td>
+						<td><li>Added option page that allows changing the forum id. (For advanced users first)</li></td>
+					</tr>
+					<tr>
+						<td>2010-05-02 v1.00</td>
+						<td><li>Initial release with only one feature of listing the programming group's threads.</li></td>
+					</tr>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
