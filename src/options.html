@@ -26,6 +26,9 @@ body {
 .options, .history {
 	width: 100%;
 }
+.option {
+	padding-bottom: 10px;
+}
 .history {
 	display: table;
 	width: 100%;
@@ -36,19 +39,29 @@ body {
 	vertical-align: top;
 }
 </style>
+<script src="jquery-1.4.2.min.js"></script>
 <script src="ffeeder.js"></script>
 <script>
+var ins
 var Option = {
 	init: function() {
-		var fid = getFid();
-		gn0("fid").value = fid;
+		ins = $(".option > input")
+		ins.each(function (i) {
+			this.value = gd(this.name)
+		})
 	},
 	save: function () {
-		setFid(gn0("fid").value)
+		ins.each(function() {
+			s(this.name, this.value)
+		})
 		id("rez").innerText = "Setting is saved."
 	},
 	reset: function() {
-		Option.setFid(Default.fid);
+		ins.each(function() {
+			var v = Default[this.name]
+			s(this.name, v)
+			this.value = v
+		})
 		id("rez").innerText = "Setting is reset."
 	},
 	setFid: function(fid) {
@@ -63,8 +76,19 @@ var Option = {
 		<div class="optionHeader">Forum Feeder Options</div>
 		<div class="options">
 			<div class="option">
-				Forum ID:
+				Forum ID: (This is what you see in the location bar about ?fid=XXX)
+				<br/>
 				<input type="text" name="fid"/>
+			</div>
+			<div class="option">
+				How many seconds to wait before clear the unread counter?
+				<br/>
+				<input type="text" name="markAsReadDelay"/> seconds
+			</div>
+			<div class="option">
+				Minimum seconds to wait before checking for new posts:
+				<br/>
+				<input type="text" name="minScanInterval"/> seconds
 			</div>
 			<input type="button" value="Save" onclick="Option.save()"/>
 			<input type="button" value="Reset" onclick="Option.reset()"/>
@@ -75,6 +99,12 @@ var Option = {
 		<div class="historyContainer">
 			<div class="historyHeader">Version history</div>
 				<table class="history">
+					<tr>
+						<td class="historyDate">2010-05-15 v1.1.2</td>
+						<td><li>Added a simple algorithm for checking new posts - the number of unread topics will be shown in the extension icon. The scanning interval is changeable thru option page.</li>
+							<li>Added mark as read with delay (changeable thru option page).</li>
+						</td>
+					</tr>
 					<tr>
 						<td class="historyDate">2010-05-09 v1.01</td>
 						<td><li>Added option page that allows changing the forum id. (For advanced users first)</li></td>
