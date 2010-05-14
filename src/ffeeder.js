@@ -1,5 +1,8 @@
 var Default = {
-	fid: '111'
+	fid: '111',
+	markAsReadDelay: 5,
+	minScanInterval: 10,
+	maxScanInterval: 3600
 }
 window["Default"] = Default
 
@@ -11,7 +14,7 @@ function popup_init() {
 	
 	setTimeout(function() {
 		markRead(maxTid)
-	}, 5000)
+	}, gd("markAsReadDelay"))
 	
 	$("<img src='" + chrome.extension.getURL("images/loading.gif") + "'/>").appendTo("#loading")
 	
@@ -23,9 +26,6 @@ function popup_init() {
 		$("#c").append("<div>" + createLink(site + forumInfo.groupHref, forumInfo.groupName) + "</div>");
 
 		if ( list.length > 0 ) {
-			var maxtime = list[0].lptime;
-			console.log(localStorage.maxtime);
-			localStorage.maxtime = maxtime;
 			maxTid = list[0].tid
 		}
 
@@ -56,7 +56,7 @@ function getForumData(fid, f) {
 }
 
 function markRead(tid) {
-	localStorage.lastTid = maxTid
+	s("lastTid", maxTid)
 	chrome.browserAction.setBadgeText({text:""})
 }
 
@@ -148,7 +148,7 @@ function t2s(time) {
 }
 
 function getFid() {
-	return g("fid") || Default.fid;
+	return gd("fid");
 }
 function setFid(fid) {
 	s("fid", fid);
@@ -156,6 +156,12 @@ function setFid(fid) {
 
 function g(k) {
 	return localStorage[k]
+}
+function gi(k) {
+	return parseInt(g(k), 10)
+}
+function gd(k) {
+	return g(k) || Default[k]
 }
 
 function s(k, v) {
@@ -182,7 +188,7 @@ window["getThreadTopics"] = getThreadTopics
 
 function Monitor(fid) {
 	this.getAtid = function() {
-		return localStorage.atid || 0;
+		return g("atid") || 0;
 	}
 	this.monitor = function() {
 		var _this = this;
@@ -204,16 +210,17 @@ function Monitor(fid) {
 			}
 		});
 		
-		setTimeout(function() {_this.monitor()}, 10 * 1000)
+		var msi = gd("minScanInterval");
+		setTimeout(function() {_this.monitor()}, msi * 1000)
 	}
 	this.updateAtid = function(atid) {
 		console.log("update atid to " + atid);
-		localStorage.atid = atid
+		s("atid", atid)
 		this.checkNewPost()
 	}
 	this.addUnread = function(c) {
-		var cnt = (localStorage.unread && localStorage.unread.i) || 0
-		localStorage.unread = { i: cnt += c }
+		var cnt = gi("unread") || 0
+		s("unread", cnt += c)
 		chrome.browserAction.setBadgeText({text:""+cnt})
 	}
 	this.checkNewPost = function() {
@@ -223,7 +230,7 @@ function Monitor(fid) {
 			var info = rez.info
 			
 			var cnt = 0
-			var lpt = localStorage.lpt || 0
+			var lpt = g("lpt") || 0
 			console.log("b4 lpt = " + lpt)
 			
 			$.each(threads, function(i) {
@@ -234,17 +241,15 @@ function Monitor(fid) {
 				cnt++
 			})
 			console.log("a7 lpt = " + threads[0].lptime)
-			localStorage.lpt = threads[0].lptime
+			s("lpt", threads[0].lptime)
 			_this.addUnread(cnt)
 		})
 	}
 }
 
 function bg_onload() {
-	localStorage.atid = 0
-	localStorage.lpt = 0
-
 	var bg1 = new Monitor(111)
+	bg1.addUnread(0)
 	bg1.monitor()
 }
 
