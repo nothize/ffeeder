@@ -14,7 +14,7 @@ function popup_init() {
 	
 	setTimeout(function() {
 		markRead(maxTid)
-	}, gd("markAsReadDelay"))
+	}, gd("markAsReadDelay") * 1000)
 	
 	$("<img src='" + chrome.extension.getURL("images/loading.gif") + "'/>").appendTo("#loading")
 	
