@@ -1,7 +1,7 @@
 var Default = {
 	"fid": '111',
 	"markAsReadDelay": 5,
-	"minScanInterval": 10,
+	"minScanInterval": 120,
 	"maxScanInterval": 3600
 }
 window["Default"] = Default
