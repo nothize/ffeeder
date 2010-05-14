@@ -10,6 +10,6 @@ $.show;
 chrome.extension.getBackgroundPage;
 chrome.extension.getURL;
 chrome.browserAction.setBadgeText;
+chrome.browserAction.setTitle;
 function $(){} 
-Default.fid;
 function parseInt() {}

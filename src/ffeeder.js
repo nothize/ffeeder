@@ -1,8 +1,8 @@
 var Default = {
-	fid: '111',
-	markAsReadDelay: 5,
-	minScanInterval: 10,
-	maxScanInterval: 3600
+	"fid": '111',
+	"markAsReadDelay": 5,
+	"minScanInterval": 10,
+	"maxScanInterval": 3600
 }
 window["Default"] = Default
 
@@ -57,6 +57,7 @@ function getForumData(fid, f) {
 
 function markRead(tid) {
 	s("lastTid", maxTid)
+	s("unread", 0)
 	chrome.browserAction.setBadgeText({text:""})
 }
 
@@ -179,6 +180,8 @@ window["id"] = id;
 window["gn0"] = gn0;
 window["s"] = s;
 window["g"] = g;
+window["gd"] = gd;
+window["gi"] = gi;
 window["getFid"] = getFid;
 window["setFid"] = setFid;
 
@@ -222,6 +225,7 @@ function Monitor(fid) {
 		var cnt = gi("unread") || 0
 		s("unread", cnt += c)
 		chrome.browserAction.setBadgeText({text:""+cnt})
+		chrome.browserAction.setTitle({title:cnt + " unread since " + g("lpt")})
 	}
 	this.checkNewPost = function() {
 		var _this = this
