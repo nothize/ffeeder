@@ -3,25 +3,30 @@ var Default = {
 }
 window["Default"] = Default
 
+var maxTid = 0
+
 function popup_init() {
 	console.log("popup_init")
 	var fid = getFid();
 	
+	setTimeout(function() {
+		markRead(maxTid)
+	}, 5000)
+	
 	$("<img src='" + chrome.extension.getURL("images/loading.gif") + "'/>").appendTo("#loading")
 	
-	$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid, function (data) {
+	var o = getForumData(fid, function(rez) {
+		var forumInfo = rez.info
+		var list = rez.threads
+		
 		var site = "www.discuss.com.hk/";
-		var html = $(data);
-
-		var forumInfo = getForumInfo(html);
 		$("#c").append("<div>" + createLink(site + forumInfo.groupHref, forumInfo.groupName) + "</div>");
 
-		var list = getThreadTopics(html);
-		
 		if ( list.length > 0 ) {
 			var maxtime = list[0].lptime;
 			console.log(localStorage.maxtime);
 			localStorage.maxtime = maxtime;
+			maxTid = list[0].tid
 		}
 
 		var divs = [];
@@ -37,7 +42,22 @@ function popup_init() {
 		$("#c").append(c);
 		$("#loading").hide();
 		c.show();
+	})
+}
+
+function getForumData(fid, f) {
+	$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid, function (data) {
+		var html = $(data);
+		var list = getThreadTopics(html);
+		var info = getForumInfo(html);
+		rez = { info: info, threads: list }
+		f(rez)
 	});
+}
+
+function markRead(tid) {
+	localStorage.lastTid = maxTid
+	chrome.browserAction.setBadgeText({text:""})
 }
 
 window["popup_init"]=popup_init;
@@ -101,13 +121,15 @@ function getThreadTopics(d) {
 				var lptime = $("span", lastpost).attr("title");
 				var lpname = $("cite a", lastpost).text();
 				var link = $("a:first", lastpost).attr("href");
+				var o = link.match(/tid=([0-9]+)/)
+				var tid = o && o[1]
 				counter = counter.split(" / ");
 				var replies = counter[0];
 				var read = counter[1];
 				
 				var time = t2s(new Date(lptime));
 				
-				list[list.length] = ({topic: topic, op: op, replies: replies, read: read, lptime: time, lpname: lpname, link: link});
+				list[list.length] = ({topic: topic, op: op, replies: replies, read: read, lptime: time, lpname: lpname, link: link, tid: tid});
 			}
 		});
 		
@@ -157,3 +179,73 @@ window["setFid"] = setFid;
 window["t2s"] = t2s;
 window["getForumInfo"] = getForumInfo;
 window["getThreadTopics"] = getThreadTopics
+
+function Monitor(fid) {
+	this.getAtid = function() {
+		return localStorage.atid || 0;
+	}
+	this.monitor = function() {
+		var _this = this;
+		
+		$.get("http://www.discuss.com.hk/archiver/?fid-" + fid + ".html", 
+//		$.get(chrome.extension.getURL("fid-" + fid + ".html"), 
+		function (data) {
+			var d = $(data)
+			var atid = 0
+			$("ul.archiver_threadlist a", d).each(function(i) {
+				var m = this.href.match(/tid-([0-9]+)/)
+				if ( m ) {
+					var tid = parseInt(m[1], 10)
+					atid += 3*tid % 4567
+				}
+			});
+			if ( atid != _this.getAtid() ) {
+				_this.updateAtid(atid)
+			}
+		});
+		
+		setTimeout(function() {_this.monitor()}, 10 * 1000)
+	}
+	this.updateAtid = function(atid) {
+		console.log("update atid to " + atid);
+		localStorage.atid = atid
+		this.checkNewPost()
+	}
+	this.addUnread = function(c) {
+		var cnt = (localStorage.unread && localStorage.unread.i) || 0
+		localStorage.unread = { i: cnt += c }
+		chrome.browserAction.setBadgeText({text:""+cnt})
+	}
+	this.checkNewPost = function() {
+		var _this = this
+		getForumData(111, function(rez) {
+			var threads = rez.threads
+			var info = rez.info
+			
+			var cnt = 0
+			var lpt = localStorage.lpt || 0
+			console.log("b4 lpt = " + lpt)
+			
+			$.each(threads, function(i) {
+				// here is a bug if the post time of two threads are the same, it won't be counted.
+				if ( this.lptime <= lpt ) {
+					return false
+				}
+				cnt++
+			})
+			console.log("a7 lpt = " + threads[0].lptime)
+			localStorage.lpt = threads[0].lptime
+			_this.addUnread(cnt)
+		})
+	}
+}
+
+function bg_onload() {
+	localStorage.atid = 0
+	localStorage.lpt = 0
+
+	var bg1 = new Monitor(111)
+	bg1.monitor()
+}
+
+window["bg_onload"] = bg_onload
