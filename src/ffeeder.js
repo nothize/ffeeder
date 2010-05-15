@@ -189,15 +189,14 @@ window["t2s"] = t2s;
 window["getForumInfo"] = getForumInfo;
 window["getThreadTopics"] = getThreadTopics
 
-function Monitor(fid) {
+function Monitor() {
 	this.getAtid = function() {
 		return g("atid") || 0;
 	}
 	this.monitor = function() {
 		var _this = this;
 		
-		$.get("http://www.discuss.com.hk/archiver/?fid-" + fid + ".html", 
-//		$.get(chrome.extension.getURL("fid-" + fid + ".html"), 
+		$.get("http://www.discuss.com.hk/archiver/?fid-" + gd("fid") + ".html", 
 		function (data) {
 			var d = $(data)
 			var atid = 0
@@ -228,7 +227,7 @@ function Monitor(fid) {
 	}
 	this.checkNewPost = function() {
 		var _this = this
-		getForumData(111, function(rez) {
+		getForumData(gd("fid"), function(rez) {
 			var threads = rez.threads
 			var info = rez.info
 			
@@ -262,7 +261,7 @@ function updateUnreadCount() {
 }
 
 function bg_onload() {
-	var bg1 = new Monitor(111)
+	var bg1 = new Monitor()
 	bg1.addUnread(0)
 	bg1.monitor()
 }
