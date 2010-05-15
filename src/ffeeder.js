@@ -58,7 +58,7 @@ function getForumData(fid, f) {
 function markRead(tid) {
 	s("lastTid", maxTid)
 	s("unread", 0)
-	chrome.browserAction.setBadgeText({text:""})
+	updateUnreadCount()
 }
 
 window["popup_init"]=popup_init;
@@ -224,8 +224,7 @@ function Monitor(fid) {
 	this.addUnread = function(c) {
 		var cnt = gi("unread") || 0
 		s("unread", cnt += c)
-		chrome.browserAction.setBadgeText({text:""+cnt})
-		chrome.browserAction.setTitle({title:cnt + " unread since " + g("lpt")})
+		updateUnreadCount()
 	}
 	this.checkNewPost = function() {
 		var _this = this
@@ -249,6 +248,17 @@ function Monitor(fid) {
 			_this.addUnread(cnt)
 		})
 	}
+}
+
+function updateUnreadCount() {
+	var cnt = gi("unread")
+	chrome.browserAction.setBadgeText({text:(cnt || "") + ""})
+	if ( cnt ) {
+		cnt = cnt + " unread since " + g("lpt")
+	} else {
+		cnt = "No new post found yet."
+	}
+	chrome.browserAction.setTitle({title:cnt})
 }
 
 function bg_onload() {
