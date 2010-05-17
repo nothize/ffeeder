@@ -203,8 +203,11 @@ function Monitor() {
 			$("ul.archiver_threadlist a", d).each(function(i) {
 				var m = this.href.match(/tid-([0-9]+)/)
 				if ( m ) {
+					var post = $("+em", this).text().match(/[0-9]+/)
+					post = (post && post[0]) || 0
 					var tid = parseInt(m[1], 10)
-					atid += 3*tid % 4567
+					console.log(tid + " " + post)
+					atid += (3*tid + 7*post) % 4567
 				}
 			});
 			if ( atid != _this.getAtid() ) {
