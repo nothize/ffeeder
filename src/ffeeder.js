@@ -84,7 +84,7 @@ function createRow(cells, prop) {
 }
 
 function createLink(href, title) {
-	return "<a target='_blank' href='http://referer.us/" + href + "'>" + title + "</a>";
+	return "<a target='_blank' href='http://" + href + "'>" + title + "</a>";
 }
 
 
