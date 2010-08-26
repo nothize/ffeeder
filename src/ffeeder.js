@@ -58,6 +58,7 @@ function getForumData(fid, f) {
 function markRead(tid) {
 	s("lastTid", maxTid)
 	s("unread", 0)
+	s("lastReadTime", t2s(new Date()))
 	updateUnreadCount()
 }
 
@@ -256,7 +257,7 @@ function updateUnreadCount() {
 	var cnt = gi("unread")
 	chrome.browserAction.setBadgeText({text:(cnt || "") + ""})
 	if ( cnt ) {
-		cnt = cnt + " unread since " + g("lpt")
+		cnt = cnt + " unread(newest thread time: " + g("lpt") + ")" + (g("lastReadTime") ? ". Last read time: " + g("lastReadTime") : "")
 	} else {
 		cnt = "No new post found yet."
 	}
