@@ -32,14 +32,17 @@ function popup_init() {
 		var divs = [];
 
 		$.each(list, function(i) {
-			divs[divs.length] = createRow([i+1, this.lptime, this.lpname, {c:"rcell",t:this.replies}, {c:"rcell",t:this.read}, this.op, 
-				createLink("computer.discuss.com.hk/" + this.link, "<div class='topic'>" + this.topic + "</div>")]);
+			divs[divs.length] = createRow([i+1, this.lptime, this.lpname, {c:"rcell",t:this.replies}, 
+				{c:"rcell",t:this.read}, this.op, 
+				createLink("computer.discuss.com.hk/" + this.link, 
+				"<div class='topic'>" + escapeHTML(this.topic) + "</div>")]);
 		});
 
 		var header = createRow(["#", "Last reply", "Last poster", {c:"rcell", t:"Replies"}, {c:"rcell", t:"Read"}, "Original poster", "Topic"], {rowClass:"hrow"});
 		var c = $("<div class='table'>" + header + divs.join("") + "</div>");
 		c.hide()
 		$("#c").append(c);
+		
 		$("#loading").hide();
 		c.show();
 	})
@@ -85,7 +88,7 @@ function createRow(cells, prop) {
 }
 
 function createLink(href, title) {
-	return "<a target='_blank' href='http://" + href + "'>" + title + "</a>";
+	return "<a target='_new' href='http://" + href + "'>" + title + "</a>";
 }
 
 
@@ -175,6 +178,10 @@ function gn0(n) {
 }
 function id(n) {
 	return document.getElementById(n)
+}
+
+function escapeHTML(v) {
+	return v.toString().replace(/</g, "&lt;")
 }
 
 window["id"] = id;
