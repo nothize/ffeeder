@@ -123,7 +123,7 @@ function getThreadTopics(d) {
 				var op = $("td.author a", this).text();
 				var counter = $("td.nums", this).text();
 				var lastpost = $("td.lastpost", this);
-				var lptime = $("span", lastpost).attr("title");
+				var lptime = $("span", lastpost).attr("title") || $("a:first", lastpost).text();
 				var lpname = $("cite a", lastpost).text();
 				var link = $("a:first", lastpost).attr("href");
 				var o = link.match(/tid=([0-9]+)/)
