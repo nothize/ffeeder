@@ -63,10 +63,6 @@ var Option = {
 			this.value = v
 		})
 		id("rez").innerText = "Setting is reset."
-	},
-	setFid: function(fid) {
-		setFid(fid);
-		gn0("fid").value = fid;
 	}
 }
 </script>
@@ -89,6 +85,11 @@ var Option = {
 				Minimum seconds to wait before checking for new posts:
 				<br/>
 				<input type="text" name="minScanInterval"/> seconds
+			</div>
+			<div class="option">
+				Minimum threads to retrieve:
+				<br/>
+				<input type="text" name="minThread"/>
 			</div>
 			<input type="button" value="Save" onclick="Option.save()"/>
 			<input type="button" value="Reset" onclick="Option.reset()"/>

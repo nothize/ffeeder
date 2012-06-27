@@ -2,7 +2,8 @@ var Default = {
 	"fid": '111',
 	"markAsReadDelay": 5,
 	"minScanInterval": 120,
-	"maxScanInterval": 3600
+	"maxScanInterval": 3600,
+	"minThread": 50
 }
 window["Default"] = Default
 
@@ -41,21 +42,38 @@ function popup_init() {
 		var header = createRow(["#", "Last reply", "Last poster", {c:"rcell", t:"Replies"}, {c:"rcell", t:"Read"}, "Original poster", "Topic"], {rowClass:"hrow"});
 		var c = $("<div class='table'>" + header + divs.join("") + "</div>");
 		c.hide()
-		$("#c").append(c);
-		
-		$("#loading").hide();
-		c.show();
+		chrome.windows.getLastFocused(function cb(w) {
+			$("#c").css("max-height", w.height-150)
+			$("#c").append(c);
+			$("#loading").hide();
+			c.show();
+		})
 	})
 }
 
 function getForumData(fid, f) {
-	$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid, function (data) {
+	var page = 1
+	var lists = []
+	var info
+	var minT = gd("minThread")
+	
+	var getlist = function (data) {
 		var html = $(data);
 		var list = getThreadTopics(html);
-		var info = getForumInfo(html);
-		rez = { info: info, threads: list }
+		
+		if ( list.length > 0 ) {
+			info = info || getForumInfo(html);
+			lists = lists.concat(list)
+			if ( lists.length < minT ) {
+				page++
+				$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid + "&page=" + page, getlist);
+				return
+			}
+		}
+		rez = { info: info, threads: lists }
 		f(rez)
-	});
+	}
+	$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid + "&page=" + page, getlist);
 }
 
 function markRead(tid) {
