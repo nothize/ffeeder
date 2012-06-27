@@ -111,7 +111,7 @@ function createLink(href, title) {
 
 
 function getForumInfo(d) {
-	var mainbox = $(".mainbox a:first", d);
+	var mainbox = $(".threadlist a:first", d);
 	var groupHref = mainbox.attr("href");
 	var groupName = mainbox.text();
 	
@@ -232,20 +232,26 @@ function Monitor() {
 					var post = $("+em", this).text().match(/[0-9]+/)
 					post = (post && post[0]) || 0
 					var tid = parseInt(m[1], 10)
-					console.log(tid + " " + post)
 					atid += (3*tid + 7*post) % 4567
 				}
 			});
 			if ( atid != _this.getAtid() ) {
+				console.log("atid: " + _this.getAtid() + " -> " + atid)
 				_this.updateAtid(atid)
 			}
 		});
-		
+		this.reschedule()
+	}
+	this.stop = function() {
+		this.hMonitor && clearTimeout(this.hMonitor)
+	}
+	this.reschedule = function() {
+		this.stop()
 		var msi = gd("minScanInterval");
-		setTimeout(function() {_this.monitor()}, msi * 1000)
+		var _this = this
+		this.hMonitor = setTimeout(function() {_this.monitor()}, msi * 1000)
 	}
 	this.updateAtid = function(atid) {
-		console.log("update atid to " + atid);
 		s("atid", atid)
 		this.checkNewPost()
 	}
