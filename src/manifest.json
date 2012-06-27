@@ -1,12 +1,12 @@
 {
-	"name" : "Forum feeder v1.1.4",
-	"version" : "1.1.4",
+	"name" : "Forum feeder",
+	"version" : "1.2",
 	"description" : "A forum monitor. (In slow development)",
 	"background_page" : "bg.html",
 	"icons" : { "48" : "icon_48.png", "128" : "icon_128.png" },
 	"browser_action" : {
 		"default_icon": "icon_19.png",
-		"default_title": "Forum Feeder v1.1.4",
+		"default_title": "Forum Feeder v1.2",
 		"popup" : "popup.html"
 	},
 	"permissions" : [
