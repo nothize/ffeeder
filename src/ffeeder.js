@@ -35,13 +35,17 @@ function popup_init() {
 		$.each(list, function(i) {
 			divs[divs.length] = createRow([i+1, this.lptime, this.lpname, {c:"rcell",t:this.replies}, 
 				{c:"rcell",t:this.read}, this.op, 
-				createLink("computer.discuss.com.hk/" + this.link, 
+				createLink("www.discuss.com.hk/" + this.link, 
 				"<div class='topic'>" + escapeHTML(this.topic) + "</div>")]);
 		});
 
 		var header = createRow(["#", "Last reply", "Last poster", {c:"rcell", t:"Replies"}, {c:"rcell", t:"Read"}, "Original poster", "Topic"], {rowClass:"hrow"});
 		var c = $("<div class='table'>" + header + divs.join("") + "</div>");
 		c.hide()
+		c.find("a").click(function() {
+			onVisitLink(this.href, event.button == 0)
+			return false
+		})
 		chrome.windows.getLastFocused(function cb(w) {
 			$("#c").css("max-height", w.height-150)
 			$("#c").append(c);
@@ -66,14 +70,14 @@ function getForumData(fid, f) {
 			lists = lists.concat(list)
 			if ( lists.length < minT ) {
 				page++
-				$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid + "&page=" + page, getlist);
+				$.get("http://www.discuss.com.hk/forumdisplay.php?fid=" + fid + "&page=" + page, getlist);
 				return
 			}
 		}
 		rez = { info: info, threads: lists }
 		f(rez)
 	}
-	$.get("http://computer.discuss.com.hk/forumdisplay.php?fid=" + fid + "&page=" + page, getlist);
+	$.get("http://www.discuss.com.hk/forumdisplay.php?fid=" + fid + "&page=" + page, getlist);
 }
 
 function markRead(tid) {
@@ -106,7 +110,11 @@ function createRow(cells, prop) {
 }
 
 function createLink(href, title) {
-	return "<a target='_new' href='http://" + href + "'>" + title + "</a>";
+	return "<a href='http://" + href + "'>" + title + "</a>";
+}
+
+function onVisitLink(href, focus) {
+	chrome.tabs.create({url:href, active:focus})
 }
 
 
@@ -299,6 +307,11 @@ function bg_onload() {
 	var bg1 = new Monitor()
 	bg1.addUnread(0)
 	bg1.monitor()
+
+}
+
+function onLoad() {
+	setTimeout(popup_init, 1)
 }
 
 window["bg_onload"] = bg_onload

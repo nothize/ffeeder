@@ -41,33 +41,9 @@ body {
 </style>
 <script src="jquery-1.4.2.min.js"></script>
 <script src="ffeeder.js"></script>
-<script>
-var ins
-var Option = {
-	init: function() {
-		ins = $(".option > input")
-		ins.each(function (i) {
-			this.value = gd(this.name)
-		})
-	},
-	save: function () {
-		ins.each(function() {
-			s(this.name, this.value)
-		})
-		id("rez").innerText = "Setting is saved."
-	},
-	reset: function() {
-		ins.each(function() {
-			var v = Default[this.name]
-			s(this.name, v)
-			this.value = v
-		})
-		id("rez").innerText = "Setting is reset."
-	}
-}
-</script>
+<script src="option.js"></script>
 </head>
-<body onload="Option.init()">
+<body>
 	<div class="container">
 		<div class="optionHeader">Forum Feeder Options</div>
 		<div class="options">
@@ -91,8 +67,8 @@ var Option = {
 				<br/>
 				<input type="text" name="minThread"/>
 			</div>
-			<input type="button" value="Save" onclick="Option.save()"/>
-			<input type="button" value="Reset" onclick="Option.reset()"/>
+			<input id="save" type="button" value="Save"/>
+			<input id="reset" type="button" value="Reset"/>
 			<div id="rez">
 				&nbsp;
 			</div>
