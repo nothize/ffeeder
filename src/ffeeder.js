@@ -19,7 +19,7 @@ function popup_init() {
 	
 	$("<img src='" + chrome.extension.getURL("images/loading.gif") + "'/>").appendTo("#loading")
 	
-	var o = getForumData(fid, function(rez) {
+	var data = getForumData(fid, function(rez) {
 		var forumInfo = rez.info
 		var list = rez.threads
 		
@@ -44,7 +44,7 @@ function popup_init() {
 		c.hide()
 		c.find("a").click(function() {
 			onVisitLink(this.href, event.button == 0 && !event.ctrlKey && !event.shiftKey)
-			return false
+			event.preventDefault()
 		})
 		chrome.windows.getLastFocused(function cb(w) {
 			$("#c").css("max-height", w.height-150)
@@ -114,7 +114,7 @@ function createLink(href, title) {
 }
 
 function onVisitLink(href, focus) {
-	chrome.tabs.create({url:href, active:focus})
+	chrome.tabs.create({'url':href, 'active':focus})
 }
 
 
@@ -230,7 +230,7 @@ var Monitor = {
 		return g("atid") || 0;
 	},
 	monitor : function() {
-		chrome.browserAction.setTitle({title:"" + new Date()})
+		chrome.browserAction.setTitle({'title':"" + new Date()})
 
 		$.get("http://www.discuss.com.hk/archiver/?fid-" + gd("fid") + ".html", 
 		function (data) {
@@ -290,18 +290,18 @@ var Monitor = {
 
 function setAlarm(f, itv) {
 	alarm_callback = f
-	chrome.alarms.create('monitor', { delayInMinutes: itv / 60 })
+	chrome.alarms.create('monitor', { 'delayInMinutes': itv / 60 })
 }
 
 function updateUnreadCount() {
 	var cnt = gi("unread")
-	chrome.browserAction.setBadgeText({text:(cnt || "") + ""})
+	chrome.browserAction.setBadgeText({'text':(cnt || "") + ""})
 	if ( cnt ) {
 		cnt = cnt + " unread(newest thread time: " + g("lpt") + ")" + (g("lastReadTime") ? ". Last read time: " + g("lastReadTime") : "")
 	} else {
 		cnt = "No new post found yet."
 	}
-	chrome.browserAction.setTitle({title:cnt})
+	chrome.browserAction.setTitle({'title':cnt})
 }
 
 function bg_onload() {
