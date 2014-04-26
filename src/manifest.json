@@ -1,7 +1,7 @@
 {
 	"name" : "Forum feeder",
 	"manifest_version" : 2,
-	"version" : "1.3",
+	"version" : "1.3.1",
 	"description" : "A forum monitor. (In slow development)",
 	"background" : {
 		"page": "bg.html",
@@ -14,7 +14,7 @@
 		"default_popup" : "popup.html"
 	},
 	"permissions" : [
-		"tabs", "http://*.discuss.com.hk/*"
+		"alarms", "tabs", "http://*.discuss.com.hk/*"
 	],
 	"options_page" : "options.html"
 }

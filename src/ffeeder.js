@@ -43,7 +43,7 @@ function popup_init() {
 		var c = $("<div class='table'>" + header + divs.join("") + "</div>");
 		c.hide()
 		c.find("a").click(function() {
-			onVisitLink(this.href, event.button == 0)
+			onVisitLink(this.href, event.button == 0 && !event.ctrlKey && !event.shiftKey)
 			return false
 		})
 		chrome.windows.getLastFocused(function cb(w) {
@@ -222,14 +222,16 @@ window["setFid"] = setFid;
 window["t2s"] = t2s;
 window["getForumInfo"] = getForumInfo;
 window["getThreadTopics"] = getThreadTopics
+window["bg_onload"] = bg_onload
+window["onLoad"] = onLoad
 
-function Monitor() {
-	this.getAtid = function() {
+var Monitor = {
+	getAtid : function() {
 		return g("atid") || 0;
-	}
-	this.monitor = function() {
-		var _this = this;
-		
+	},
+	monitor : function() {
+		chrome.browserAction.setTitle({title:"" + new Date()})
+
 		$.get("http://www.discuss.com.hk/archiver/?fid-" + gd("fid") + ".html", 
 		function (data) {
 			var d = $(data)
@@ -243,33 +245,27 @@ function Monitor() {
 					atid += (3*tid + 7*post) % 4567
 				}
 			});
-			if ( atid != _this.getAtid() ) {
-				console.log("atid: " + _this.getAtid() + " -> " + atid)
-				_this.updateAtid(atid)
+			if ( atid != Monitor.getAtid() ) {
+				console.log("atid: " + Monitor.getAtid() + " -> " + atid)
+				Monitor.updateAtid(atid)
 			}
 		});
-		this.reschedule()
-	}
-	this.stop = function() {
-		this.hMonitor && clearTimeout(this.hMonitor)
-	}
-	this.reschedule = function() {
-		this.stop()
+		Monitor.reschedule()
+	},
+	reschedule : function() {
 		var msi = gd("minScanInterval");
-		var _this = this
-		this.hMonitor = setTimeout(function() {_this.monitor()}, msi * 1000)
-	}
-	this.updateAtid = function(atid) {
+		setAlarm(monitorAlarm, msi)
+	},
+	updateAtid : function(atid) {
 		s("atid", atid)
-		this.checkNewPost()
-	}
-	this.addUnread = function(c) {
+		Monitor.checkNewPost()
+	},
+	addUnread : function(c) {
 		var cnt = gi("unread") || 0
 		s("unread", cnt += c)
 		updateUnreadCount()
-	}
-	this.checkNewPost = function() {
-		var _this = this
+	},
+	checkNewPost : function() {
 		getForumData(gd("fid"), function(rez) {
 			var threads = rez.threads
 			var info = rez.info
@@ -287,9 +283,14 @@ function Monitor() {
 			})
 			console.log("a7 lpt = " + threads[0].lptime)
 			s("lpt", threads[0].lptime)
-			_this.addUnread(cnt)
+			Monitor.addUnread(cnt)
 		})
 	}
+}
+
+function setAlarm(f, itv) {
+	alarm_callback = f
+	chrome.alarms.create('monitor', { delayInMinutes: itv / 60 })
 }
 
 function updateUnreadCount() {
@@ -304,10 +305,20 @@ function updateUnreadCount() {
 }
 
 function bg_onload() {
-	var bg1 = new Monitor()
-	bg1.addUnread(0)
-	bg1.monitor()
+	Monitor.addUnread(0)
+	Monitor.monitor()
 
+  	chrome.alarms.onAlarm.addListener(onAlarm);
+}
+
+function onAlarm(alarm) {
+	if ( alarm && alarm.name == 'monitor' ) {
+		alarm_callback();
+	}
+}
+
+function monitorAlarm() {
+	Monitor.monitor()
 }
 
 function onLoad() {
